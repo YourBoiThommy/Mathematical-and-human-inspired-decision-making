@@ -57,8 +57,7 @@ C1 = eye(2);
 D1 = 0;
 
 % Define prediction horizon and control horizon
-P = 10;
-M = 1;
+Np = 10;
 
 % Define initial condition
 x0 = [10; 0];
@@ -67,7 +66,9 @@ x0 = [10; 0];
 plant = ss(A1, B1, C1, D1, k);
 
 % Create MPC controller mpcobject
-mpcobj = mpc(plant, P, M);
+mpcobj = mpc(plant);
+mpcobj.PredictionHorizon = Np;
+
 setEstimator(mpcobj,'custom');
 
 % Define cost function weights
@@ -100,18 +101,7 @@ Np = 100;
 M = 1;
 
 % Create MPC controller mpcobject with updated prediction horizon
-mpcobj = mpc(plant, Np, M);
-
-% Set cost function weights
-mpcobj.Weights.ManipulatedVariables = {R};
-mpcobj.Weights.OutputVariables = {Q};
-
-% Set input constraints
-mpcobj.MV(1).Min = -1;
-mpcobj.MV(1).Max = 1;
-
-% Set state constraint
-mpcobj.OV(1).Min = -2;
+mpcobj.PredictionHorizon = Np;
 
 %% Exercise 1.6: Include terminal constraint x_k+Np[2] = 0
 % Define prediction horizon and control horizon
@@ -142,3 +132,34 @@ mpcobj.OV(1).Min = -2;
 %setterminal = mpcobj
 
 %% Excercise 1.7: 
+
+% Define system matrices
+A2 = [4/3, -2/3; 1, 0];
+B2 = [1; 0];
+C2 = eye(2);
+D2 = 0;
+
+% Define prediction horizon and control horizon
+P2 = 5;
+M2 = 1;
+
+% Define initial condition
+x0 = [10; 0];
+
+% Time Step
+k = 1;
+
+% Create LTI model mpcobject
+plant2 = ss(A2, B2, C2, D2, k);
+
+% Create MPC controller mpcobject
+mpcobj2 = mpc(plant2, P2, M2);
+setEstimator(mpcobj2,'custom');
+
+% Define cost function weights
+Q2 = [sqrt(4/3+0.001), sqrt(-2/3); sqrt(-2/3), sqrt(1.001)]; % State weight matrix
+R2 = 0.001;                                                  % Input weight
+
+% Set cost function weights
+mpcobj2.Weights.ManipulatedVariables = {R2};
+mpcobj2.Weights.OutputVariables = {Q2};

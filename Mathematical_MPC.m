@@ -1,4 +1,3 @@
-
 % Define system matrices
 A1 = [1, 0.1; 0, 1];
 B1 = [0; 0.1];
@@ -17,7 +16,7 @@ n_states = size(A1, 1);
 n_inputs = size(B1, 2);
 
 % Time Step
-k = 0.1;
+k = 1;
 
 % Create LTI model mpcobject
 plant = ss(A1, B1, C1, D1, k);
@@ -40,7 +39,11 @@ x_k = x0;
 % Create MPCSTATE mpcobject
 xc = mpcstate(mpcobj);
 
-for i = 1:20 % Run for 20 time steps
+% Initialize arrays to store results
+x_results = zeros(2, 200);
+u_results = zeros(1, 200);
+
+for i = 1:200 % Run for 200 time steps
     % Obtain optimal control action
     [u_k, info] = mpcmove(mpcobj, xc);
     
@@ -50,13 +53,32 @@ for i = 1:20 % Run for 20 time steps
     % Update the measured state
     xc.Plant = x_k;
     
-    % Display results
-    disp(['x_k:', num2str(x_k'), ', u_k:', num2str(u_k')]);
+    % Store results
+    x_results(:, i) = x_k;
+    u_results(i) = u_k;
 end
 
+% Plot results
+figure;
+subplot(2, 1, 1);
+plot(1:200, x_results(1, :), 'b', 'LineWidth', 1.5);
+hold on;
+plot(1:200, x_results(2, :), 'r', 'LineWidth', 1.5);
+xlabel('Time Step');
+ylabel('State Value');
+title('State Evolution');
+legend('x_1', 'x_2');
+grid on;
+
+subplot(2, 1, 2);
+plot(1:200, u_results, 'k', 'LineWidth', 1.5);
+xlabel('Time Step');
+ylabel('Control Input');
+title('Control Input Evolution');
+grid on;
 %%
 % Exercise 1.2: Change Q = 100I
-Q = 100 * eye(2); % State weight matrix
+Q = 10 * eye(2); % State weight matrix
 
 % Set cost function weights
 mpcobj.Weights.ManipulatedVariables = {R};
@@ -68,7 +90,7 @@ x_k = x0;
 % Create MPCSTATE mpcobject
 xc = mpcstate(mpcobj);
 
-for i = 1:20 % Run for 20 time steps
+for i = 1:200 % Run for 20 time steps
     % Obtain optimal control action
     [u_k, info] = mpcmove(mpcobj, xc);
     
@@ -184,6 +206,7 @@ M = 1;
 
 % Create MPC controller mpcobject
 mpcobj = mpc(plant, P, M);
+mpcobj.PredictionHorizon = 8;
 
 % Set cost function weights
 mpcobj.Weights.ManipulatedVariables =  {R};
@@ -197,12 +220,13 @@ mpcobj.MV(1).Max =     1;
 mpcobj.OV(1).Min = -2;
 
 % Define terminal constraint for the second element of the state vector
-%TerminalConstr.A = zeros(size(A1, 1), size(A1, 1) * P);
-%TerminalConstr.A(2, end-1:end) = [1 -1]; % Second element difference
-%TerminalConstr.B = 0;
+%TerminalConstr =  struct('Weight',[0,10], 'Min',[-inf, 0],'Max',[Inf, 0])
+%U = struct('Min',[1,-Inf]);
 
 % Include terminal constraint
-%mpcobj = setterminal(mpcobj, TerminalConstr);
+%setterminal(mpcobj, TerminalConstr);
+% Include terminal constraint
+%setterminal = mpcobj
 % Initialize states
 x_k = x0;
 

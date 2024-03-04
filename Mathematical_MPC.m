@@ -1,7 +1,6 @@
 %% Plot results
-% Time vector and simulation steps
-t = 0:k:sec;
-N_steps = length(t);
+% Time vector
+t = 0:N_steps-1;
 
 % Initialize arrays to store results
 x_results = zeros(2, N_steps);
@@ -55,7 +54,7 @@ clear;
 
 % Time Step and Seconds
 k = 0.1;
-sec = 120*k;
+N_steps = 120;
 
 % Define system matrices
 A1 = [1, 0.1; 0, 1];
@@ -68,23 +67,23 @@ x0 = [10; 0];
 
 % Define prediction horizon and control horizon
 Np = 10;
+M = 2;
 
 % Create LTI model mpcobject
 plant = ss(A1, B1, C1, D1, k);
-
-% Create MPC controller mpcobject
-mpcobj = mpc(plant);
-mpcobj.PredictionHorizon = Np;
-
-setEstimator(mpcobj,'custom');
 
 % Define cost function weights
 Q = eye(2); % State weight matrix
 R = 1;      % Input weight
 
+% Create MPC controller mpcobject
+mpcobj = mpc(plant, k, Np, M);
+
 % Set cost function weights
 mpcobj.Weights.ManipulatedVariables = {R};
 mpcobj.Weights.OutputVariables = {Q};
+
+setEstimator(mpcobj,'custom');
 
 %% Exercise 1.2: Change Q = 100I
 Q = 10 * eye(2); % State weight matrix
@@ -112,12 +111,14 @@ mpcobj.PredictionHorizon = Np;
 % Define prediction horizon and control horizon
 Np = 10;
 
-% Create MPC controller mpcobject with updated prediction horizon
-mpcobj.PredictionHorizon = Np;
+% Define cost weights
+W = struct('ManipulatedVariables',R,'OutputVariables',Q);
+mpcobj = mpc(plant,k,Np,M,W);
+setEstimator(mpcobj,'custom');
 
 % Define terminal constraint for the second element of the state vector
-Y = struct('Min',[-Inf, 0],'Max',[Inf, 0]);
-U = struct('Min',[-Inf,-Inf]);
+Y = struct('Weight',[10,10],'Min',[-Inf, 0],'Max',[Inf, 0]);
+U = struct();
 
 % Include terminal constraint
 setterminal(mpcobj, Y, U);

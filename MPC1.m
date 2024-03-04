@@ -56,7 +56,7 @@ clc;
 clear;
 
 % Time Step and Seconds
-k = 0.1;
+k = 1;
 N_steps = 120;
 
 % Define system matrices

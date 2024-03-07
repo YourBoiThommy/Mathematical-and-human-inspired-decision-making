@@ -56,7 +56,7 @@ xk = x0;
 for i = 1:N_steps
     f = 2*xk.'*A_tilde.'*Q_tilde*B_tilde;
     %c = xk.'*A_tilde.'*Q_tilde*A_tilde*xk;
-    u_pred = quadprog(H,f);
+    u_pred = quadprog(H,f,[],[],[],[],lb,ub,xk);
     uk = u_pred(1);
     xk = A*xk + B*uk;
 
@@ -105,4 +105,11 @@ Q = eye(2);
 R = 1;
 
 %% Excercise 2.2:
-Q = 100 * eye(2);
+Q = [100 0; 0 1];
+
+%% Excercise 2.3:
+lb = -1;
+ub = 1;
+
+%% Exercose 2.4:
+

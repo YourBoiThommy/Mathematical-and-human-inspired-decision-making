@@ -70,7 +70,7 @@ x0 = [10; 0];
 
 % Define prediction horizon and control horizon
 Np = 10;
-M = 2;
+M = Np;
 
 % Create LTI model mpcobject
 plant = ss(A1, B1, C1, D1, k);
@@ -79,17 +79,16 @@ plant = ss(A1, B1, C1, D1, k);
 Q = [1 1]; % State weight matrix
 R = 1;      % Input weight
 
-% Create MPC controller mpcobject
-mpcobj = mpc(plant, k, Np, M);
-
 % Set cost function weights
-mpcobj.Weights.ManipulatedVariables = R;
-mpcobj.Weights.OutputVariables = Q;
+W = struct('ManipulatedVariables', R, 'ManipulatedVariablesRate', 0, 'OutputVariables', Q);
+
+% Create MPC controller mpcobject
+mpcobj = mpc(plant, k, Np, M, W);
 
 setEstimator(mpcobj,'custom');
 
 %% Exercise 1.2: Change Q = 100I
-Q = [10 10]; % State weight matrix
+Q = [10 1]; % State weight matrix
 
 % Set cost function weights
 mpcobj.Weights.OutputVariables = Q;
@@ -102,23 +101,28 @@ mpcobj.MV(1).Max = 1;
 %% Exercise 1.4: Include state constraint x_k[1] > -2
 % Set state constraints
 mpcobj.OV(1).Min = -2;
+mpcobj.OV(1).Max = Inf;
 
 %% Exercise 1.5: Increase prediction horizon to Np = 100
 % Define prediction horizon and control horizon
 Np = 100;
+M = Np;
 
 % Create MPC controller mpcobject with updated prediction horizon
 mpcobj.PredictionHorizon = Np;
+mpcobj.ControlHorizon = M;
 
 %% Exercise 1.6: Include terminal constraint x_k+Np[2] = 0
 % Define prediction horizon and control horizon
 Np = 10;
+M = Np;
 
 % Create MPC controller mpcobject with updated prediction horizon
 mpcobj.PredictionHorizon = Np;
+mpcobj.ControlHorizon = M;
 
 % Define terminal constraint for the second element of the state vector
-Y = struct('Weight',[10,10],'Min',[-Inf, -0.1],'Max',[Inf, 0.1]);
+Y = struct('Weight', [1 1],'Min',[-Inf, -0.1],'Max',[Inf, 0.1]);
 U = struct();
 
 % Include terminal constraint

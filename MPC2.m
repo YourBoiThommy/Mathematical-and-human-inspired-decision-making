@@ -5,7 +5,11 @@ A_tilde = [];
 G_tilde = [];
 for i = 1:Np
     A_tilde = [A_tilde; A^i];
-    G_tilde = [G_tilde; G];
+    if i ~= Np
+        G_tilde = [G_tilde; G];
+    elseif i == Np
+        G_tilde = [G_tilde; G + Gf];
+    end
 end
 
 B_tilde = [];
@@ -44,7 +48,8 @@ for i = 1:Np
             Fij = zeros(size(F));
         end
         if i == Np & j == Np
-            Qij = Qij + Qf;
+            Eij = Eij + Ef;
+            Fij = Fij + Ff;
         end
         Ri = [Ri Rij];
         Qi = [Qi Qij];
@@ -127,11 +132,14 @@ x0 = [10; 0];
 
 Q = eye(2);
 R = 1;
-Qf = zeros(2);
 
 E = [0; 0];
 F = [0 0; 0 0];
 G = [0; 0];
+
+Ef = [0; 0];
+Ff = [0 0; 0 0];
+Gf = [0; 0];
 
 %% Excercise 2.2:
 Q = [100 0; 0 1];
@@ -146,9 +154,20 @@ E = [1; -1; 0];
 F = [0 0; 0 0; -1 0];
 G = [1; 1; 2];
 
+Ef = [0; 0; 0];
+Ff = [0 0; 0 0; 0 0];
+Gf = [0; 0; 0];
+
 %% Excercise 2.5:
 Np = 100;
 
 %% Exercise 2.6: 
 Np = 10;
-Qf = [1 0; 0 1];
+
+E = [1; -1; 0; 0; 0];
+F = [0 0; 0 0; -1 0; 0 0; 0 0];
+G = [1; 1; 2; 0; 0];
+
+Ef = [0; 0; 0; 0; 0];
+Ff = [0 0; 0 0; 0 0; 0 1; 0 -1];
+Gf = [0; 0; 0; 0.0001; 0.0001];

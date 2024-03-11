@@ -21,13 +21,13 @@ for i = 1:N_steps
     B = [cos(xrk(3))*k 0; sin(xrk(3))*k 0; 0 k];
 
     B_tilde = [];
-    for i = 1:Np
+    for a = 1:Np
         Bi = [];
-        for j = 1:Np
-            if i-j < 0
+        for b = 1:Np
+            if a-b < 0
                 Bij = zeros(size(B));
             else
-                Bij = A^(i-j) * B;
+                Bij = A^(a-b) * B;
             end
             Bi = [Bi Bij];
         end
@@ -40,8 +40,8 @@ for i = 1:N_steps
     Q_tilde = [];
     E_tilde = [];
     F_tilde = [];
-    for i = 1:Np
-        if i == Np
+    for j = 1:Np
+        if j == Np
             E_tilde = blkdiag(E_tilde, E + Et);
             F_tilde = blkdiag(F_tilde, F + Ft);
             G_tilde = [G_tilde; G + Gt];
@@ -50,7 +50,7 @@ for i = 1:N_steps
             F_tilde = blkdiag(F_tilde, F);
             G_tilde = [G_tilde; G];
         end
-        A_tilde = [A_tilde; A^i];
+        A_tilde = [A_tilde; A^j];
         R_tilde = blkdiag(R_tilde, R);
         Q_tilde = blkdiag(Q_tilde, Q);
     end
@@ -73,12 +73,13 @@ for i = 1:N_steps
         disp("Infeasible optimization problem at timestep " + i);
         break
     end
+    exk;
     euk = eu_pred(1:2);
     exk = A*exk + B*euk;
 
     % Store results
-    x_results(:, i) = exk + [vr*cos(xrk(3)); vr*sin(xrk(3)); wr];
-    u_results(:, i) = euk + ur;
+    x_results(:, i) = exk;
+    u_results(:, i) = euk;
 end
 warning('on', 'all');
 
@@ -129,7 +130,7 @@ R = eye(2);
 
 E = [1 0.23655; 1 -0.23655; -1 0.23655; -1 -0.23655];
 F = [0 0 0; 0 0 0; 0 0 0; 0 0 0];
-G = [0.46; 0.46; 0.46; 0.46];
+G = [0.46+vr+0.23655*wr; 0.46+vr-0.23655*wr; 0.46-vr+0.23655*wr; 0.46-vr-0.23655*wr];
 
 Et = [0 0; 0 0; 0 0; 0 0];
 Ft = [0 0 0; 0 0 0; 0 0 0; 0 0 0];

@@ -27,9 +27,6 @@ for i = 1:N_steps
     % Store results
     x_results(:, i) = x_k;
     u_results(i) = u_k;
-
-    % Display results
-    % disp(['x_k:', num2str(x_k'), ', u_k:', num2str(u_k')]);
 end
 
 figure;
@@ -57,7 +54,7 @@ clear;
 
 % Time Step and Seconds
 k = 1;
-N_steps = 120;
+N_steps = 160;
 
 % Define system matrices
 A1 = [1, 0.1; 0, 1];
@@ -88,22 +85,26 @@ mpcobj = mpc(plant, k, Np, M, W);
 setEstimator(mpcobj,'custom');
 
 %% Exercise 1.2: Change Q = 100I
+N_steps = 40;
 Q = [10 1]; % State weight matrix
 
 % Set cost function weights
 mpcobj.Weights.OutputVariables = Q;
 
 %% Exercise 1.3: Include input constraint |uk| < 1
+N_steps = 200;
 % Set input constraints
 mpcobj.MV(1).Min = -1;
 mpcobj.MV(1).Max = 1;
 
 %% Exercise 1.4: Include state constraint x_k[1] > -2
+N_steps = 200;
 % Set state constraints
 mpcobj.OV(1).Min = -2;
 mpcobj.OV(1).Max = Inf;
 
 %% Exercise 1.5: Increase prediction horizon to Np = 100
+N_steps = 100;
 % Define prediction horizon and control horizon
 Np = 100;
 M = Np;
@@ -113,6 +114,7 @@ mpcobj.PredictionHorizon = Np;
 mpcobj.ControlHorizon = M;
 
 %% Exercise 1.6: Include terminal constraint x_k+Np[2] = 0
+N_steps = 140;
 % Define prediction horizon and control horizon
 Np = 10;
 M = Np;

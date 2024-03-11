@@ -21,9 +21,6 @@ for i = 1:N_steps
     % Store results
     x_results(:, i) = x_k;
     u_results(i) = u_k;
-
-    % Display results
-    % disp(['x_k:', num2str(x_k'), ', u_k:', num2str(u_k')]);
 end
 
 figure;
@@ -51,7 +48,7 @@ clear;
 
 % Time Step and Seconds
 k = 1;
-N_steps = 120;
+N_steps = 400;
 
 % Define system matrices
 A2 = [4/3, -2/3; 1, 0];

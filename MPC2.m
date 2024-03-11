@@ -1,17 +1,6 @@
 %% Plot results
 close all;
 
-A_tilde = [];
-G_tilde = [];
-for i = 1:Np
-    A_tilde = [A_tilde; A^i];
-    if i ~= Np
-        G_tilde = [G_tilde; G];
-    elseif i == Np
-        G_tilde = [G_tilde; G + Gf];
-    end
-end
-
 B_tilde = [];
 for i = 1:Np
     Bi = [];
@@ -26,44 +15,31 @@ for i = 1:Np
     B_tilde = [B_tilde; Bi];
 end
 
+A_tilde = [];
+G_tilde = [];
 R_tilde = [];
 Q_tilde = [];
 E_tilde = [];
 F_tilde = [];
 for i = 1:Np
-    Ri = [];
-    Qi = [];
-    Ei = [];
-    Fi = [];
-    for j = 1:Np
-        if i-j == 0
-            Rij = R;
-            Qij = Q;
-            Eij = E;
-            Fij = F;
-        else
-            Rij = zeros(size(R));
-            Qij = zeros(size(Q));
-            Eij = zeros(size(E));
-            Fij = zeros(size(F));
-        end
-        if i == Np & j == Np
-            Eij = Eij + Ef;
-            Fij = Fij + Ff;
-        end
-        Ri = [Ri Rij];
-        Qi = [Qi Qij];
-        Ei = [Ei Eij];
-        Fi = [Fi Fij];
+    if i == Np
+        E_tilde = blkdiag(E_tilde, E + Et);
+        F_tilde = blkdiag(F_tilde, F + Ft);
+        G_tilde = [G_tilde; G + Gt];
+    else
+        E_tilde = blkdiag(E_tilde, E);
+        F_tilde = blkdiag(F_tilde, F);
+        G_tilde = [G_tilde; G];
     end
-    R_tilde = [R_tilde; Ri];
-    Q_tilde = [Q_tilde; Qi];
-    E_tilde = [E_tilde; Ei];
-    F_tilde = [F_tilde; Fi];
+    A_tilde = [A_tilde; A^i];
+    R_tilde = blkdiag(R_tilde, R);
+    Q_tilde = blkdiag(Q_tilde, Q);
 end
 
+% Constraint matrix
 Aineq = E_tilde + F_tilde*B_tilde;
 
+% Hessian cost representation
 H = B_tilde.'*Q_tilde*B_tilde + R_tilde;
 
 % Time vector
@@ -77,14 +53,22 @@ u_results = zeros(1, N_steps);
 xk = x0;
 
 % Quadprog options
-options = optimoptions('quadprog', 'Display', 'final');
+options = optimoptions('quadprog', 'Display', 'off');
 warning('off', 'all');
 
 for i = 1:N_steps
+    % Contraints RHS vector
     bineq = G_tilde - F_tilde*A_tilde*xk;
+
+    % State cost
     f = 2*xk.'*A_tilde.'*Q_tilde*B_tilde;
-    %c = xk.'*A_tilde.'*Q_tilde*A_tilde*xk;
+
+    % Get next optimal input and update SS
     u_pred = quadprog(H,f,Aineq,bineq,[],[],[],[],[],options);
+    if size(u_pred, 1) == 0
+        disp("Infeasible optimization problem at timestep " + i);
+        break
+    end
     uk = u_pred(1);
     xk = A*xk + B*uk;
 
@@ -119,7 +103,7 @@ clear;
 
 % Time Step and Seconds
 k = 1;
-N_steps = 120;
+N_steps = 160;
 
 Np = 10;
 
@@ -137,37 +121,47 @@ E = [0; 0];
 F = [0 0; 0 0];
 G = [0; 0];
 
-Ef = [0; 0];
-Ff = [0 0; 0 0];
-Gf = [0; 0];
+Et = [0; 0];
+Ft = [0 0; 0 0];
+Gt = [0; 0];
 
 %% Excercise 2.2:
+N_steps = 40;
+
 Q = [100 0; 0 1];
 
 %% Excercise 2.3:
+N_steps = 200;
+
 E = [1; -1];
 F = [0 0; 0 0];
 G = [1; 1];
 
 %% Excercise 2.4:
+N_steps = 200;
+
 E = [1; -1; 0];
 F = [0 0; 0 0; -1 0];
 G = [1; 1; 2];
 
-Ef = [0; 0; 0];
-Ff = [0 0; 0 0; 0 0];
-Gf = [0; 0; 0];
+Et = [0; 0; 0];
+Ft = [0 0; 0 0; 0 0];
+Gt = [0; 0; 0];
 
 %% Excercise 2.5:
+N_steps = 100;
+
 Np = 100;
 
 %% Exercise 2.6: 
+N_steps = 140;
+
 Np = 10;
 
 E = [1; -1; 0; 0; 0];
 F = [0 0; 0 0; -1 0; 0 0; 0 0];
 G = [1; 1; 2; 0; 0];
 
-Ef = [0; 0; 0; 0; 0];
-Ff = [0 0; 0 0; 0 0; 0 1; 0 -1];
-Gf = [0; 0; 0; 0.0001; 0.0001];
+Et = [0; 0; 0; 0; 0];
+Ft = [0 0; 0 0; 0 0; 0 1; 0 -1];
+Gt = [0; 0; 0; 0.00000001; 0.00000001];

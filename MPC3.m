@@ -75,7 +75,7 @@ for i = 1:N_steps
     end
     exk;
     euk = eu_pred(1:2);
-    exk = A*exk + B*euk;
+    exk = A*exk + B*euk + W(:, i);
 
     % Store results
     x_results(:, i) = exk;
@@ -135,3 +135,14 @@ G = [0.46+vr+0.23655*wr; 0.46+vr-0.23655*wr; 0.46-vr+0.23655*wr; 0.46-vr-0.23655
 Et = [0 0; 0 0; 0 0; 0 0];
 Ft = [0 0 0; 0 0 0; 0 0 0; 0 0 0];
 Gt = [0; 0; 0; 0];
+
+%% Excercise 3.2: 
+W = mvnrnd(zeros(N_steps, 3), 0.0001*eye(3))';
+e0 = [0; 0; 0];
+
+%% Excercise 3.3:
+Q = 50*eye(3);
+R = 100*eye(2);
+
+%% Excercise 3.4:
+W = mvnrnd(zeros(N_steps, 3), 0.1*eye(3))';

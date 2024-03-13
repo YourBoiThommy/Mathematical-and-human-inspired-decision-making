@@ -68,8 +68,20 @@ for i = 1:length(output)
 end
 
 % Plotting stuff goes here
-figure;
+figure(1);
 surf(R1_mam);
+xlabel('x');
+ylabel('y');
+zlabel('\mu');
+
+figure(2);
+surf(R1_lars);
+xlabel('x');
+ylabel('y');
+zlabel('\mu');
+
+figure(3);                  % Need to double check this
+surf(R1_KD);
 xlabel('x');
 ylabel('y');
 zlabel('\mu');

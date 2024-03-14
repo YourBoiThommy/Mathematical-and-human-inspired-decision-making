@@ -11,17 +11,17 @@ u_results = zeros(2, N_steps);
 % Initialize state
 exk = e0;
 xrk = xr;
-xk = xr;
+%xk = xr;
 % Quadprog options
 options = optimoptions('quadprog', 'Display', 'off');
 warning('off', 'all');
+%xrk = [0.2*cos(2*pi*i/N_steps); 0.2*sin(2*pi*i/N_steps); atan2(0.2*sin(2*pi*i/N_steps), 0.2*cos(2*pi*i/N_steps))];
 
 for i = 1:N_steps
-    
-    
+
+
     A = [1 0 -vr*sin(xrk(3))*k; 0 1 vr*cos(xrk(3))*k; 0 0 1];
     B = [cos(xrk(3))*k 0; sin(xrk(3))*k 0; 0 k];
-
 
     B_tilde = [];
     for a = 1:Np
@@ -79,20 +79,21 @@ for i = 1:N_steps
     exk;
     euk = eu_pred(1:2);
     exk = A*exk + B*euk + W(:, i);
-    xk(1) = (ur(1)+euk(1))*cos(xrk(3)+exk(3))*k + xk(1);
-    xk(2) = (ur(1)+euk(1))*sin(xrk(3)+exk(3))*k + xk(2);
-    xk(3) = (ur(2)+euk(2))*k + xk(3);
-    %xk = exk + xrk;
+
+    xk = exk + xrk;
+    % xk(1) = (ur(1)+euk(1))*cos(xrk(3)+exk(3))*k + xk(1);
+    % xk(2) = (ur(1)+euk(1))*sin(xrk(3)+exk(3))*k + xk(2);
+    % xk(3) = (ur(2)+euk(2))*k + xk(3);
     uk = euk + ur;
-    %d = normrnd(0,0.0001,3,N);
+
     % Store results
     x_results(:, i) = xk;
     r_results(:, i) = xrk;
     u_results(:, i) = uk;
 
     % Update Reference
-    theta_r = xrk(3)+ur(2)*k;
-    xrk = [0.2*cos(2*pi*i/N_steps); 0.2*sin(2*pi*i/N_steps); theta_r];
+    % theta_r = xrk(3)+ur(2)*k;
+    xrk = [0.2*cos(2*pi*i/N_steps); 0.2*sin(2*pi*i/N_steps); atan2(0.2*sin(2*pi*i/N_steps), 0.2*cos(2*pi*i/N_steps)) + pi/2];
 
     
 end
@@ -151,16 +152,16 @@ clear;
 
 % Time Step and Seconds
 k = 0.1;
-N_steps = 200;
+N_steps = 100;
 
 % Define reference and initial condition
 vr = 0.2;
 wr = 1;
-xr = [0; 0; 0];
+xr = [ 0; 0; 0];
 ur = [vr; wr];
 e0 = [0.1; 0; 0];
-
-Np  = 10;
+%xr = xr + e0;
+Np  = 20;
 
 Q = eye(3);
 R = eye(2);

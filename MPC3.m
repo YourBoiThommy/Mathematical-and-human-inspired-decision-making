@@ -11,14 +11,17 @@ u_results = zeros(2, N_steps);
 % Initialize state
 exk = e0;
 xrk = xr;
-
+xk = xr;
 % Quadprog options
 options = optimoptions('quadprog', 'Display', 'off');
 warning('off', 'all');
 
 for i = 1:N_steps
+    
+    
     A = [1 0 -vr*sin(xrk(3))*k; 0 1 vr*cos(xrk(3))*k; 0 0 1];
     B = [cos(xrk(3))*k 0; sin(xrk(3))*k 0; 0 k];
+
 
     B_tilde = [];
     for a = 1:Np
@@ -76,29 +79,63 @@ for i = 1:N_steps
     exk;
     euk = eu_pred(1:2);
     exk = A*exk + B*euk + W(:, i);
-
+    xk(1) = (ur(1)+euk(1))*cos(xrk(3)+exk(3))*k + xk(1);
+    xk(2) = (ur(1)+euk(1))*sin(xrk(3)+exk(3))*k + xk(2);
+    xk(3) = (ur(2)+euk(2))*k + xk(3);
+    %xk = exk + xrk;
+    uk = euk + ur;
+    %d = normrnd(0,0.0001,3,N);
     % Store results
-    x_results(:, i) = exk;
-    u_results(:, i) = euk;
+    x_results(:, i) = xk;
+    r_results(:, i) = xrk;
+    u_results(:, i) = uk;
+
+    % Update Reference
+    theta_r = xrk(3)+ur(2)*k;
+    xrk = [0.2*cos(2*pi*i/N_steps); 0.2*sin(2*pi*i/N_steps); theta_r];
+
+    
 end
 warning('on', 'all');
 
+
+% Plot the trajectory in the x-y plane
 figure;
-subplot(2, 1, 1);
+plot(x_results(1, :), x_results(2, :), 'b', 'LineWidth', 1.5);
+hold on
+plot(r_results(1, :), r_results(2, :), 'r', 'LineWidth', 1.5);
+plot(xr(1), xr(2), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r'); % Plot the reference point
+xlabel('X Position');
+ylabel('Y Position');
+title('Robot Trajectory');
+grid on;
+legend('Robot Trajectory', 'Reference Trajectory', 'Reference Point');
+
+
+figure;
+subplot(4, 1, 1);
 plot(t, x_results(1, :), 'b', 'LineWidth', 1.5);
-hold on;
+ylabel('State Value');
+title('State Evolution');
+legend('x_1');
+grid on;
+
+subplot(4, 1, 2);
 plot(t, x_results(2, :), 'r', 'LineWidth', 1.5);
-hold on;
+ylabel('State Value');
+legend('x_2');
+grid on;
+
+subplot(4, 1, 3);
 plot(t, x_results(3, :), 'g', 'LineWidth', 1.5);
 xlabel('Time Step');
 ylabel('State Value');
-title('State Evolution');
-legend('x_1', 'x_2', 'x_3');
+legend('x_3');
 grid on;
 
 [ts1,us1] = stairs(t,u_results(1, :));
 [ts2,us2] = stairs(t,u_results(2, :));
-subplot(2, 1, 2);
+subplot(4, 1, 4);
 plot(ts1, us1, 'k', 'LineWidth', 1.5);
 hold on;
 plot(ts2, us2, 'm', 'LineWidth', 1.5);
@@ -114,7 +151,7 @@ clear;
 
 % Time Step and Seconds
 k = 0.1;
-N_steps = 160;
+N_steps = 200;
 
 % Define reference and initial condition
 vr = 0.2;
@@ -123,7 +160,7 @@ xr = [0; 0; 0];
 ur = [vr; wr];
 e0 = [0.1; 0; 0];
 
-Np = 10;
+Np  = 10;
 
 Q = eye(3);
 R = eye(2);
@@ -136,13 +173,15 @@ Et = [0 0; 0 0; 0 0; 0 0];
 Ft = [0 0 0; 0 0 0; 0 0 0; 0 0 0];
 Gt = [0; 0; 0; 0];
 
+W = zeros(3, N_steps);
+
 %% Excercise 3.2: 
 W = mvnrnd(zeros(N_steps, 3), 0.0001*eye(3))';
 e0 = [0; 0; 0];
 
 %% Excercise 3.3:
-Q = 50*eye(3);
+Q = 1*eye(3);
 R = 100*eye(2);
 
 %% Excercise 3.4:
-W = mvnrnd(zeros(N_steps, 3), 0.1*eye(3))';
+W = mvnrnd(zeros(N_steps, 3), 0.001*eye(3))';

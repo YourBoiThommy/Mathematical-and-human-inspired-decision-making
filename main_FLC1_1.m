@@ -93,3 +93,21 @@ intercol = find(Z1(interrow,:) > 0);
 
 % Computing and plotting output fuzzy set
 outZ1 = max(Z1,[],1);
+
+%% Exercise 1.3
+% Computing fuzzy relations corresponding to R2 & R3 using Mamdani
+R2_mam  = zeros(length(input),length(output));
+R3_mam  = zeros(length(input),length(output));
+
+for i = 1:length(output)      
+    for j = 1:length(input)
+        Mamdami2 = min(input(2,j),output(2,i));
+        Mamdami3 = min(input(3,j),output(3,i));
+
+        R2_mam(j,i)     = Mamdami2;
+        R3_mam(j,i)     = Mamdami3;
+    end
+end
+
+% Aggregating three rules using Conjunction Rule Aggregation
+B_cra = max(max(R1_mam, R2_mam),R3_mam);

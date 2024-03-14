@@ -1,3 +1,15 @@
+%% Project 2 Math HI Decision Making: Steering a Car using FLC
+
+% Change plotflag to 1 if you would like to see plots
+% Refer to showplotFLC function for more info
+plotflag = 0;
+if plotflag == 1
+    showplotFLC;
+else
+    disp('Plots will not be displayed.');
+end
+
+% Define domains
 X = 0:0.05:10;
 Y = 0:0.10:30;
 
@@ -67,21 +79,17 @@ for i = 1:length(output)
     end
 end
 
-% Plotting stuff goes here
-figure(1);
-surf(R1_mam);
-xlabel('x');
-ylabel('y');
-zlabel('\mu');
+%% Exercise 1.2
+% Computing the intersection
+Z1 = zeros(size(R1_mam));
 
-figure(2);
-surf(R1_lars);
-xlabel('x');
-ylabel('y');
-zlabel('\mu');
+for i = 1:length(in2_disc)
+    Z1(i,:) = min(in2_disc(i),R1_mam(i,:));
+end
 
-figure(3);                  % Need to double check this
-surf(R1_KD);
-xlabel('x');
-ylabel('y');
-zlabel('\mu');
+% Finding indices of where intersection occurs first
+[interrow,tempcol]   = find(Z1>0,1,'first');
+intercol = find(Z1(interrow,:) > 0);
+
+% Computing and plotting output fuzzy set
+outZ1 = max(Z1,[],1);

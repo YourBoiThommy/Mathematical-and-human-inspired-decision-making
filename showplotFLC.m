@@ -40,8 +40,8 @@ surf(repmat(in2_disc,length(in2_disc),1),'FaceAlpha', 0.2,...
 hold on
 surf(R1_mam,'FaceAlpha', 0.2,'Edgecolor','none','FaceColor','b');
 surf(Z1,'FaceAlpha', 0.5,'Edgecolor','none','FaceColor','g')
-plot3(temprow*ones(size(intercol)),intercol,...
-    Z1(temprow,intercol),'ro','MarkerSize', 4);
+plot3(interrow*ones(size(intercol)),intercol,...
+    Z1(interrow,intercol),'ro','MarkerSize', 4);
 hold off
 axis tight;
 xlabel('x');

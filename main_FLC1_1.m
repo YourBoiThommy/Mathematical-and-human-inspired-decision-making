@@ -111,3 +111,7 @@ end
 
 % Aggregating three rules using Conjunction Rule Aggregation
 B_cra = max(max(R1_mam, R2_mam),R3_mam);
+
+%% Exercise 1.4
+crisp_val = 4.7/0.05;
+fuzzy_set = input(:,crisp_val);

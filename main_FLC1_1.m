@@ -113,5 +113,13 @@ end
 B_cra = max(max(R1_mam, R2_mam),R3_mam);
 
 %% Exercise 1.4
-crisp_val = 4.7/0.05;
-fuzzy_set = input(:,crisp_val);
+% Representing crisp input value by fuzzy set using Singleton
+crisp_val   = 4.7/0.05;
+fuzzy_in    = input(:,crisp_val);
+
+fuzzy_ston              = zeros(length(fuzzy_in),width(input));
+fuzzy_ston(:,crisp_val) = fuzzy_in;
+
+% Computing fuzzy set y using compositional rule of inference
+mu_B        = max(B_cra,[],1);
+y_cog       = (sum(Y.*mu_B))/(sum(mu_B));

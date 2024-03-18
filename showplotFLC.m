@@ -79,3 +79,23 @@ xlabel('x');
 ylabel('y');
 zlabel('\mu');
 title('Rule Base B Resulting from Conjunction Rule Aggregation');
+
+%% Exercise 1.4
+% Plotting intersection rule base B and input fuzzy sets
+figure(9);
+surf(B_cra,'FaceAlpha', 0.65,'Edgecolor','none');
+hold on
+surf(repmat(R1_mam(crisp_val,:),length(R1_mam),1),'FaceAlpha', ...
+    0.6,'Edgecolor','none','FaceColor','r');
+surf(repmat(R2_mam(crisp_val,:),length(R2_mam),1),'FaceAlpha', ...
+    0.6,'Edgecolor','none','FaceColor','[0 0.55 0]');
+surf(repmat(R3_mam(crisp_val,:),length(R3_mam),1),'FaceAlpha', ...
+    0.6,'Edgecolor','none','FaceColor','[1 0 1]');
+hold off
+axis tight;
+xlabel('x');
+ylabel('y');
+zlabel('\mu');
+legend('B','R1','R2','R3');
+title('Intersection Rule Base B and Input Fuzzy Sets');
+

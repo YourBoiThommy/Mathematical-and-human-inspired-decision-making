@@ -60,16 +60,17 @@ title('Output Fuzzy Set');
 %% Exercise 1.3
 % Plotting relations corresponding to R2 and R3
 figure(7);
-surf(R2_mam,'FaceAlpha', 0.2,'Edgecolor','none','FaceColor','r');
+surf(R1_mam,'FaceAlpha', 0.4,'Edgecolor','none','FaceColor','r');
 hold on
-surf(R3_mam,'FaceAlpha', 0.2,'Edgecolor','none','FaceColor','b');
+surf(R2_mam,'FaceAlpha', 0.4,'Edgecolor','none','FaceColor','[0 0.55 0]');
+surf(R3_mam,'FaceAlpha', 0.4,'Edgecolor','none','FaceColor','b');
 hold off
 axis tight;
 xlabel('x');
 ylabel('y');
 zlabel('\mu');
-legend('R2','R3')
-title('Fuzzy Relations corresponding to Rules R2 and R3');
+legend('R1','R2','R3')
+title('Fuzzy Relations corresponding to R1, R2, R3');
 
 % Plotting rule base B obtained using conjunction
 figure(8);

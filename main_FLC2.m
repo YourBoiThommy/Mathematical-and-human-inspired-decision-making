@@ -1,3 +1,4 @@
+% Please note: it is recommended to run by section
 % Define domains
 dt1 = 0.05;
 dt2 = 1;
@@ -239,3 +240,123 @@ title('Aggregated output');
 % xlabel('y');
 % ylabel('\mu');
 % hold off
+
+%% Exercise 2.2
+
+x1cr = 1/dt1;
+x2cr = 370/dt2;       % [kg]
+x3cr = 7.2/dt3;       % [mm/hr]
+
+% Estimating membership degrees
+mu_x1   = inx1(:,x1cr);
+mu_x2   = inx2(:,x2cr);
+mu_x3   = inx3(:,x3cr);
+
+% Constructing logical connectives for antecedents
+R10m    = mu_x1(3);
+R13m    = max(max(mu_x1(1),mu_x2(3)),mu_x3(3));
+R6m     = min(mu_x2(3),mu_x3(2));
+R9m     = min(mu_x2(3),mu_x3(3));
+
+ZR10    = zeros(1,length(out2_disc));
+ZR13    = zeros(1,length(out1_disc));
+ZR6     = zeros(1,length(out2_disc));
+ZR9     = zeros(1,length(out1_disc));
+for i = 1:length(out4_disc)
+    ZR10(i) = min(R10m,out2_disc(i));
+    ZR13(i) = min(R13m,out1_disc(i));
+    ZR6(i)  = min(R6m,out2_disc(i));
+    ZR9(i)  = min(R9m,out1_disc(i));
+end
+
+mu_B = zeros(1,length(ZR10));
+for i = 1:length(mu_B)
+    mu_B(i) = max(max(max(ZR10(i),ZR13(i)),ZR6(i)),ZR9(i));
+end
+
+y_cog   = (sum(Y.*mu_B))/(sum(mu_B));
+max_muB = max(mu_B);
+coreB   = find(mu_B == max_muB);
+y_mom   = ((coreB(1)+coreB(end))/2)*dty;
+
+plot(Y,mu_B);
+hold on
+xline(y_cog, 'k--', 'LineWidth',1.5,'Color','red','Label','y_{CoG}'); 
+xline(y_mom, 'k--', 'LineWidth',1.5,'Color','red','Label','y_{MoM}'); 
+hold off
+xlabel('y');
+ylabel('\mu');
+title('Aggregated output');
+
+%% Exercise 2.3
+% Creating system
+fis = mamfis("Name","velocity");
+
+% Adding input variables
+fis = addInput(fis,[0 10],"Name","road quality");
+fis = addInput(fis,[0 390],"Name","car load");
+fis = addInput(fis,[0 15],"Name","rain intensity");
+
+% Adding input membership functions
+fis = addMF(fis,"road quality","trapmf",[0 2.2 3.4 5.6],"Name","bad");
+fis = addMF(fis,"road quality","trapmf",[2.2 4.4 5.6 7.8],"Name","acceptable");
+fis = addMF(fis,"road quality","trapmf",[4.4 6.6 7.8 10],"Name","good");
+
+fis = addMF(fis,"car load","trapmf",[0 45 115 160],"Name","low");
+fis = addMF(fis,"car load","trapmf",[115 160 230 275],"Name","average");
+fis = addMF(fis,"car load","trapmf",[230 275 345 390],"Name","high");
+
+fis = addMF(fis,"rain intensity","trapmf",[0 1 2 3],"Name","light");
+fis = addMF(fis,"rain intensity","trapmf",[2 3 7 8],"Name","moderate");
+fis = addMF(fis,"rain intensity","trapmf",[7 8 14 15],"Name","heavy");
+
+% Adding output variable
+fis = addOutput(fis,[0 30],"Name","car speed");
+
+% Adding output membership functions
+fis = addMF(fis,"car speed","trapmf",[0 2.5 5.5 8],"Name","very slow");
+fis = addMF(fis,"car speed","trapmf",[5.5 8 11 13.5],"Name","slow");
+fis = addMF(fis,"car speed","trapmf",[11 13.5 16.5 19],"Name","medium");
+fis = addMF(fis,"car speed","trapmf",[16.5 19 22 24.5],"Name","fast");
+fis = addMF(fis,"car speed","trapmf",[22 24.5 27.5 30],"Name","very fast");
+
+% Defining rule list
+ruleList = [0 1 1 5 1 1;
+            0 2 1 4 1 1;
+            0 3 1 3 1 1;
+            0 1 2 4 1 1;
+            0 2 2 3 1 1;
+            0 3 2 2 1 1;
+            0 1 3 2 1 1;
+            0 2 3 2 1 1;
+            0 3 3 1 1 1;
+            1 0 0 2 1 1;
+            2 0 0 3 1 1;
+            3 0 0 4 1 1;
+            1 3 3 1 1 2];
+
+% Adding rules to the FIS
+fis = addRule(fis,ruleList);
+
+% At this point, the application may be used for analysis
+
+% Plotting aggregated- and crisp outputs from evalfis
+% Uncomment the one of the two input sets in evalfis you're interested in
+inputs = [8 130 4;
+          1 370 7.2;]
+evalfis(fis,inputs)
+
+[output,fuzzifiedIn,ruleOut,aggregatedOut,ruleFiring] = evalfis(fis,inputs(1,:));
+% [output,fuzzifiedIn,ruleOut,aggregatedOut,ruleFiring] = evalfis(fis,inputs(2,:));
+outputRange = linspace(fis.output.range(1),fis.output.range(2),length(aggregatedOut))'; 
+plot(outputRange,aggregatedOut,[output output],[0 1])
+
+%% Exercise 2.4
+inputs = [8 180 9;
+          9 180 9;]
+evalfis(fis,inputs)
+
+[output,fuzzifiedIn,ruleOut,aggregatedOut,ruleFiring] = evalfis(fis,inputs(1,:));
+% [output,fuzzifiedIn,ruleOut,aggregatedOut,ruleFiring] = evalfis(fis,inputs(2,:));
+outputRange = linspace(fis.output.range(1),fis.output.range(2),length(aggregatedOut))'; 
+plot(outputRange,aggregatedOut,[output output],[0 1])

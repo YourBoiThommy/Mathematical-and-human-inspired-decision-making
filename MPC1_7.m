@@ -23,7 +23,7 @@ for i = 1:N_steps
     u_results(i) = u_k;
 end
 
-figure;
+h = figure;
 subplot(2, 1, 1);
 plot(t, x_results(1, :), 'b', 'LineWidth', 1.5);
 hold on;
@@ -41,6 +41,11 @@ xlabel('Time Step');
 ylabel('Control Input');
 title('Control Input Evolution');
 grid on;
+
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h, append(pwd,'\',name,'.pdf'),'-dpdf','-r0')
 
 %% Excercise 1.7:
 clc;
@@ -76,6 +81,8 @@ end
 % Feedback matrix
 % K = [-0.0256, 0.6654];
 
+name='1.7';
+
 %% Excercise 1.8:
 % Define prediction horizon and control horizon
 Np = 7;
@@ -86,3 +93,5 @@ for k = Np:-1:1
     K = -inv(B2.'*P*B2 + R)*B2.'*P*A2;
     P = Q + A2.'*P*(A2 + B2*K);
 end
+
+name='1.8';

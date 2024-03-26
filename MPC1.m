@@ -52,7 +52,7 @@ grid on;
 set(h,'Units','Inches');
 pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(h,'C:\Users\Thoma\Documents\MATLAB\Mathematical\1.3.pdf','-dpdf','-r0')
+print(h, append(pwd,'\',name,'.pdf'),'-dpdf','-r0')
 
 %% Exercise 1.1: Initialize
 clc;
@@ -90,6 +90,8 @@ mpcobj = mpc(plant, k, Np, M, W);
 
 setEstimator(mpcobj,'custom');
 
+name='1.1';
+
 %% Exercise 1.2: Change Q = 100I
 N_steps = 30;
 Q = [10 1]; % State weight matrix
@@ -97,17 +99,23 @@ Q = [10 1]; % State weight matrix
 % Set cost function weights
 mpcobj.Weights.OutputVariables = Q;
 
+name='1.2';
+
 %% Exercise 1.3: Include input constraint |uk| < 1
 N_steps = 200;
 % Set input constraints
 mpcobj.MV(1).Min = -1;
 mpcobj.MV(1).Max = 1;
 
+name='1.3';
+
 %% Exercise 1.4: Include state constraint x_k[1] > -2
 N_steps = 200;
 % Set state constraints
 mpcobj.OV(1).Min = -2;
 mpcobj.OV(1).Max = Inf;
+
+name='1.4';
 
 %% Exercise 1.5: Increase prediction horizon to Np = 100
 N_steps = 100;
@@ -118,6 +126,8 @@ M = Np;
 % Create MPC controller mpcobject with updated prediction horizon
 mpcobj.PredictionHorizon = Np;
 mpcobj.ControlHorizon = M;
+
+name='1.5';
 
 %% Exercise 1.6: Include terminal constraint x_k+Np[2] = 0
 N_steps = 140;
@@ -135,4 +145,6 @@ U = struct();
 
 % Include terminal constraint
 setterminal(mpcobj, Y, U);
+
+name='1.6';
 

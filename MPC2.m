@@ -116,7 +116,7 @@ grid on;
 set(h,'Units','Inches');
 pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(h,'C:\Users\Thoma\Documents\MATLAB\Mathematical\2.2.pdf','-dpdf','-r0')
+print(h, append(pwd,'\',name,'.pdf'),'-dpdf','-r0')
 
 %% Excercise 2.1:
 clc;
@@ -146,10 +146,14 @@ Et = 0;
 Ft = [0 0];
 Gt = 0;
 
+name='2.1';
+
 %% Excercise 2.2:
 N_steps = 30;
 
 Q = [100 0; 0 1];
+
+name='2.2';
 
 %% Excercise 2.3:
 N_steps = 200;
@@ -157,6 +161,8 @@ N_steps = 200;
 E = [1; -1];
 F = [0 0; 0 0];
 G = [1; 1];
+
+name='2.3';
 
 %% Excercise 2.4:
 N_steps = 200;
@@ -169,10 +175,14 @@ Et = [0; 0; 0];
 Ft = [0 0; 0 0; 0 0];
 Gt = [0; 0; 0];
 
+name='2.4';
+
 %% Excercise 2.5:
 N_steps = 100;
 
 Np = 100;
+
+name='2.5';
 
 %% Exercise 2.6: 
 N_steps = 140;
@@ -186,3 +196,5 @@ G = [1; 1; 2; 0; 0];
 Et = [0; 0; 0; 0; 0];
 Ft = [0 0; 0 0; 0 0; 0 1; 0 -1];
 Gt = [0; 0; 0; 0.00000001; 0.00000001];
+
+name='2.6';

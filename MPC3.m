@@ -101,7 +101,7 @@ warning('on', 'all');
 
 
 % Plot the trajectory in the x-y plane
-figure;
+h = figure;
 plot(x_results(1, :), x_results(2, :), 'b', 'LineWidth', 1.5);
 hold on
 plot(r_results(1, :), r_results(2, :), 'r', 'LineWidth', 1.5);
@@ -112,7 +112,7 @@ title('Robot Trajectory');
 grid on;
 legend('Robot Trajectory', 'Reference Trajectory');
 
-figure;
+p = figure;
 subplot(4, 1, 1);
 plot(t, x_results(1, :), 'b', 'LineWidth', 1.5);
 ylabel('State Value');
@@ -145,6 +145,16 @@ title('Control Input Evolution');
 legend('u_1', 'u_2');
 grid on;
 
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h, append(pwd,'\',name,'state+input','.pdf'),'-dpdf','-r0')
+
+set(p,'Units','Inches');
+pos = get(p,'Position');
+set(p,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(p, append(pwd,'\',name,'traj','.pdf'),'-dpdf','-r0')
+
 %% Excercise 3.1:
 clc;
 clear;
@@ -175,19 +185,27 @@ Gt = [0; 0; 0; 0];
 
 W = zeros(3, N_steps);
 
+name='3.1';
+
 %% Excercise 3.2: 
 W = normrnd(0,0.0001,3,N_steps);
 e0 = [0; 0; 0];
 xr = [ 0; 0; 0];
 xr = xr + e0;
 
+name='3.2';
+
 
 %% Excercise 3.3:
 Q = 1*eye(3);
 R = 100*eye(2);
+
+name='3.3';
 
 %% Excercise 3.4:
 W = normrnd(0,0.1,3,N_steps);
 e0 = [0; 0; 0];
 xr = [ 0; 0; 0];
 xr = xr + e0;
+
+name='3.4';

@@ -1,6 +1,7 @@
 %% Plot results
 close all;
 
+%Initialize B tilde matrix
 B_tilde = [];
 for i = 1:Np
     Bi = [];
@@ -15,6 +16,7 @@ for i = 1:Np
     B_tilde = [B_tilde; Bi];
 end
 
+%Initialize the other tilde matrices
 A_tilde = [];
 G_tilde = [];
 R_tilde = [];
@@ -51,34 +53,47 @@ u_results = zeros(1, N_steps);
 
 % Initialize state
 xk = x0;
-
+uk = 0;
 % Quadprog options
 options = optimoptions('quadprog', 'Display', 'off');
 warning('off', 'all');
 
 for i = 1:N_steps
+
+    % Store results
+    x_results(:, i) = xk;
+    u_results(i) = uk;
+
     % Contraints RHS vector
     bineq = G_tilde - F_tilde*A_tilde*xk;
 
     % State cost
     f = 2*xk.'*A_tilde.'*Q_tilde*B_tilde;
 
-    % Get next optimal input and update SS
+    % Get next optimal input
     u_pred = quadprog(H,f,Aineq,bineq,[],[],[],[],[],options);
     if size(u_pred, 1) == 0
         disp("Infeasible optimization problem at timestep " + i);
         break
     end
-    uk = u_pred(1);
-    xk = A*xk + B*uk;
 
-    % Store results
-    x_results(:, i) = xk;
-    u_results(i) = uk;
+    % Update control input
+    uk = u_pred(1);
+
+    % Get next state
+    xk = A*xk + B*uk;
 end
+
 warning('on', 'all');
 
-figure;
+% Store final value results
+x_results(:, end) = xk;
+u_results(end) = uk;
+
+
+h = figure;
+
+% Plot state evolution
 subplot(2, 1, 1);
 plot(t, x_results(1, :), 'b', 'LineWidth', 1.5);
 hold on;
@@ -89,6 +104,7 @@ title('State Evolution');
 legend('x_1', 'x_2');
 grid on;
 
+% Plot input evolution
 [ts,us] = stairs(t,u_results);
 subplot(2, 1, 2);
 plot(ts, us, 'k', 'LineWidth', 1.5);
@@ -96,6 +112,11 @@ xlabel('Time Step');
 ylabel('Control Input');
 title('Control Input Evolution');
 grid on;
+
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'C:\Users\Thoma\Documents\MATLAB\Mathematical\2.2.pdf','-dpdf','-r0')
 
 %% Excercise 2.1:
 clc;
@@ -126,7 +147,7 @@ Ft = [0 0];
 Gt = 0;
 
 %% Excercise 2.2:
-N_steps = 40;
+N_steps = 30;
 
 Q = [100 0; 0 1];
 

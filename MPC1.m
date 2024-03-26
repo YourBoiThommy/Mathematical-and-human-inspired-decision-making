@@ -29,7 +29,8 @@ for i = 1:N_steps
     u_results(i) = u_k;
 end
 
-figure;
+
+h= figure;
 subplot(2, 1, 1);
 plot(t, x_results(1, :), 'b', 'LineWidth', 1.5);
 hold on;
@@ -47,6 +48,11 @@ xlabel('Time Step');
 ylabel('Control Input');
 title('Control Input Evolution');
 grid on;
+
+set(h,'Units','Inches');
+pos = get(h,'Position');
+set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(h,'C:\Users\Thoma\Documents\MATLAB\Mathematical\1.3.pdf','-dpdf','-r0')
 
 %% Exercise 1.1: Initialize
 clc;
@@ -85,7 +91,7 @@ mpcobj = mpc(plant, k, Np, M, W);
 setEstimator(mpcobj,'custom');
 
 %% Exercise 1.2: Change Q = 100I
-N_steps = 40;
+N_steps = 30;
 Q = [10 1]; % State weight matrix
 
 % Set cost function weights

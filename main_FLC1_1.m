@@ -111,3 +111,22 @@ end
 
 % Aggregating three rules using Conjunction Rule Aggregation
 B_cra = max(max(R1_mam, R2_mam),R3_mam);
+
+%% Exercise 1.4
+% Representing crisp input value by fuzzy set using Singleton
+crisp_val   = 4.7/0.05;
+fuzzy_ston = zeros(1,length(input));
+fuzzy_ston(1,crisp_val) = 1;
+
+% Computing fuzzy set y using compositional rule of inference
+Zb          = zeros(size(B_cra));
+
+for i = 1:length(fuzzy_ston)
+    Zb(i,:) = min(fuzzy_ston(i),B_cra(i,:));
+end
+
+% Applying Center of Gravity (CoG) and Mean of Maxima (MoM) methods
+mu_B        = max(Zb,[],1);
+y_cog       = (sum(Y.*mu_B))/(sum(mu_B));
+coreB       = find(mu_B == 1);
+y_mom       = ((coreB(1)+coreB(end))/2)*0.10;

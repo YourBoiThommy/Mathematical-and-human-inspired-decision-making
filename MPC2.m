@@ -49,11 +49,11 @@ t = 0:N_steps-1;
 
 % Initialize arrays to store results
 x_results = zeros(2, N_steps);
-u_results = zeros(1, N_steps);
+u_results = zeros(2, N_steps);
 
 % Initialize state
 xk = x0;
-uk = 0;
+uk = [0; 0];
 % Quadprog options
 options = optimoptions('quadprog', 'Display', 'off');
 warning('off', 'all');
@@ -62,7 +62,7 @@ for i = 1:N_steps
 
     % Store results
     x_results(:, i) = xk;
-    u_results(i) = uk;
+    u_results(:, i) = uk;
 
     % Contraints RHS vector
     bineq = G_tilde - F_tilde*A_tilde*xk;
@@ -71,14 +71,14 @@ for i = 1:N_steps
     f = 2*xk.'*A_tilde.'*Q_tilde*B_tilde;
 
     % Get next optimal input
-    u_pred = quadprog(H,f,Aineq,bineq,[],[],[],[],[],options);
+    u_pred = quadprog(H*2,f,Aineq,bineq,[],[],[],[],[],options);
     if size(u_pred, 1) == 0
         disp("Infeasible optimization problem at timestep " + i);
         break
     end
 
     % Update control input
-    uk = u_pred(1);
+    uk = u_pred(1:2);
 
     % Get next state
     xk = A*xk + B*uk;
@@ -88,7 +88,7 @@ warning('on', 'all');
 
 % Store final value results
 x_results(:, end) = xk;
-u_results(end) = uk;
+u_results(:, end) = uk;
 
 
 h = figure;
@@ -105,13 +105,17 @@ legend('x_1', 'x_2');
 grid on;
 
 % Plot input evolution
-[ts,us] = stairs(t,u_results);
+[ts,us] = stairs(t,u_results(1,:));
 subplot(2, 1, 2);
+plot(ts, us, 'k', 'LineWidth', 1.5);
+hold on;
+[ts,us] = stairs(t,u_results(2,:));
 plot(ts, us, 'k', 'LineWidth', 1.5);
 xlabel('Time Step');
 ylabel('Control Input');
 title('Control Input Evolution');
 grid on;
+
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
@@ -129,20 +133,20 @@ N_steps = 160;
 Np = 10;
 
 A = [1 0.1; 0 1];
-B = [0; 0.1];
+B = [0 0.1; 0.1 0];
 C = eye(2);
 D = 0;
 
 x0 = [10; 0];
 
 Q = eye(2);
-R = 1;
+R = eye(2);
 
-E = 0;
+E = [0 0];
 F = [0 0];
 G = 0;
 
-Et = 0;
+Et = [0 0];
 Ft = [0 0];
 Gt = 0;
 
